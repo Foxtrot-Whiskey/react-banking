@@ -1,69 +1,42 @@
-import React from 'react';
+import React, { Component } from 'react';
+import { withRouter } from 'react-router-dom';
+
 
 import { withFirebase } from '../Firebase';
 import * as ROUTES from "../../constants/routes";
 
 
-const SignOutButton = ({ firebase }) => (
-    <button type="button" onClick={firebase.doSignOut}>
-        Sign Out
-    </button>
-);
+const INITIAL_STATE = {
+    username: '',
+    email: '',
+    passwordOne: '',
+    passwordTwo: '',
+    error: null
+}
 
 class SignOutButton extends Component {
     constructor(props) {
         super(props);
     }
 
-    onSubmit = event => {
-        const { email, password } = this.state;
-
-        this.props.firebase
-            .doSignInWithEmailAndPassword(email, password)
-            .then(() => {
-                this.setState({ ...INITIAL_STATE });
-                this.props.history.push(ROUTES.HOME);
-            })
-            .catch(error => {
-                this.setState({ error });
-            });
+    onClick = event => {
+        this.props.firebase.doSignOut().then(() => {
+            this.setState({ ...INITIAL_STATE});
+            this.props.history.push(ROUTES.LANDING)
+        });
 
         event.preventDefault();
-    };
 
-    onChange = event => {
-        this.setState({ [event.target.name]: event.target.value });
     };
 
     render() {
-        const { email, password, error } = this.state;
-
-        const isInvalid = password === '' || email === '';
 
         return (
-            <form onSubmit={this.onSubmit}>
-                <input
-                    name="email"
-                    value={email}
-                    onChange={this.onChange}
-                    type="text"
-                    placeholder="Email Address"
-                />
-                <input
-                    name="password"
-                    value={password}
-                    onChange={this.onChange}
-                    type="password"
-                    placeholder="Password"
-                />
-                <button disabled={isInvalid} type="submit">
-                    Sign In
-                </button>
-
-                {error && <p>{error.message}</p>}
-            </form>
+        <button type="button" onClick={this.onClick}>
+            Sign Out
+        </button>
         );
     }
 }
 
-export default withFirebase(SignOutButton);
+export default withRouter(withFirebase(SignOutButton));
